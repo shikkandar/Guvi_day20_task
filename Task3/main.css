@@ -1,0 +1,16 @@
+img{
+    aspect-ratio: 16/9;
+}
+.c-card{
+    border-radius: 8px;
+    background: rgb(217,199,161);
+    background: linear-gradient(90deg, rgba(217,199,161,1) 0%, rgba(66,84,83,1) 88%);
+    border: 0;
+}
+h5{
+    border-radius: 5px;
+}
+
+p{
+    color: #fff;
+}
