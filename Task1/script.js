@@ -12,6 +12,8 @@ let surahNumber = 1;
 
 
 
+
+
 /*************************************Quran audio data start here *****************************************/
 const audioDivMain=document.getElementById('audio');
 const audioDiv=document.createElement('div');
@@ -141,6 +143,8 @@ async function quranDta(surahData) {
 
 
 
+
+
 /*************************************pagination start here********************************************/
 function pagination(len) {
     const btsCount=Math.ceil(len/itemPerPage)
@@ -152,7 +156,7 @@ function pagination(len) {
         const allBtn=document.createElement('button');
         allBtn.setAttribute('class','btn btn-success m-2')
     
-        allBtn.addEventListener('click', scrollTop);
+
 
         allBtn.innerText=i;
         allBtn.addEventListener('click',()=>{
@@ -160,9 +164,24 @@ function pagination(len) {
             apiData()
         })
         paginationContainer.appendChild(allBtn)
+        allBtn.addEventListener('click', scrollTop);
     }
 }
 /*************************************pagination end here********************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**************************Dta manipulating sideMenu Heading and audio*******************************/
 //Surah names
 const quranSurahNames = [
@@ -192,6 +211,7 @@ document.getElementById('inpuBtn').addEventListener('click', () => {
                             </audio>`
         input.value = '';
         apiData(); // Fetch and display updated data
+        scrollTop()
     }else alert("Enter a valid surah")
 });
 
@@ -214,22 +234,33 @@ function sideMenu(...quranSurahNames) {
        li.addEventListener('click',()=>{
         currentPage=1;
         surahNumber=i+1;
-        audioDiv.innerHTML=` <audio controls>
-                             <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
-                         </audio>
-                         <audio controls>
-                                    <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
-                        </audio>`
-       
-
+        audioDiv.innerHTML=`<audio controls>
+                                <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
+                            </audio>
+                            <audio controls>
+                                <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
+                            </audio>`
         head.innerHTML = `<h3>${surahNumber}.${quranSurahNames[surahNumber - 1]}-${arabicSuraNames[surahNumber - 1]} <h3/>`;
         apiData()
+        toggleBtn();
+        scrollTop()
        })
        
     })
    
 }
 /**************************Dta manipulating sideMenu Heading and audio*******************************/
+
+
+
+
+
+
+
+
+
+
+
 
 /**********************************Toggle controller start here**************************************/
 
@@ -245,8 +276,18 @@ const toggleBtn = ()=>{
 
 btnOpen.addEventListener("click" , toggleBtn);
 closebtnEl.addEventListener("click" , toggleBtn);
+/**********************************Toggle controller end here**************************************/
 
 
+
+
+
+
+
+
+
+
+/**********************************Scroll control start here**************************************/
 // Scroll to top 
 const upBtn = document.getElementById('top');
 const sub2 = document.getElementById('sub-2');
@@ -268,4 +309,4 @@ function scrollDown() {
 }
 topBtn.addEventListener('click',scrollDown)
 
-/**********************************Toggle controller end here**************************************/
+/**********************************Scroll control end here**************************************/
