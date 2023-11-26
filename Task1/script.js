@@ -3,6 +3,15 @@ let currentPage=1;
 let itemPerPage=40;
 let surahNumber = 1;
 /********************************variable declaration for pagination***************************** *********/
+
+
+
+
+
+
+
+
+
 /*************************************Quran audio data start here *****************************************/
 const audioDivMain=document.getElementById('audio');
 const audioDiv=document.createElement('div');
@@ -24,6 +33,16 @@ function quranAudio(surahNumber) {
 }
 quranAudio(surahNumber)
 /*************************************Quran audio data end here *****************************************/
+
+
+
+
+
+
+
+
+
+
 
 /*************************************Quran Text Data Start here*****************************************/
 
@@ -59,33 +78,69 @@ async function quranDta(surahData) {
     localStorage.setItem('fullDataArr',JSON.stringify(fullDataArr))
 
   // Display surah translation in the surah div
-  const suraContainer= document.getElementById('sura')
-  suraContainer.innerHTML='';
+
 
 
   //text controller
-  let textSize=0;
-  
+
+  let arabicFont=32;
+  let tamilFont=18;
+
+  document.getElementById('plus').addEventListener('click',()=>{
+    if (arabicFont <96 && tamilFont<96) {
+        arabicFont +=2
+        tamilFont +=2
+        console.log(arabicFont,tamilFont);
+        dataPrinting()
+    }else{
+        arabicFont=32;
+        tamilFont=18;
+    }
+  })
+  document.getElementById('minize').addEventListener('click',()=>{
+    if (arabicFont >8 && tamilFont>0) {
+        arabicFont -=4
+        tamilFont -=2
+         console.log(arabicFont,tamilFont);
+        dataPrinting()
+       }else{
+        arabicFont=32;
+        tamilFont=18;
+       }
+  })
   //Reterive full data arr from local storage
   const storedData=JSON.parse(localStorage.getItem('fullDataArr'))
-  console.log(storedData);
+
   //slice data
   const startIndex=(currentPage-1)*itemPerPage;
   const endIndex=startIndex+itemPerPage;
 
   const slicedData=storedData.slice(startIndex,endIndex)
-
+  const suraContainer= document.getElementById('sura')
+ function dataPrinting() {
+    suraContainer.innerHTML='';
     slicedData.forEach(({arabicText,tamilText})=>{
         const div = document.createElement('div');
 
-        div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${32 + textSize}px;">${arabicText }<h2/>
-                       <h6 style="font-size: ${18 + textSize}px;">${tamilText}<h6/>`;
+        div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${arabicFont}px;">${arabicText }<h2/>
+                       <h6 style="font-size: ${tamilFont}px;">${tamilText}<h6/>`;
 
         suraContainer.appendChild(div);
     })
+ }
+ dataPrinting()
     pagination(sura.length)
 }
 /*************************************Quran Text Data end here*****************************************/
+
+
+
+
+
+
+
+
+
 /*************************************pagination start here********************************************/
 function pagination(len) {
     const btsCount=Math.ceil(len/itemPerPage)
