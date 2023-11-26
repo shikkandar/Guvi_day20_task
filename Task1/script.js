@@ -1,69 +1,92 @@
+/*********************************variable declaration for pagination*************************************/
 let currentPage=1;
 let itemPerPage=40;
 let surahNumber = 1;
-
-
+/********************************variable declaration for pagination***************************** *********/
+/*************************************Quran audio data start here *****************************************/
 const audioDivMain=document.getElementById('audio');
 const audioDiv=document.createElement('div');
 
+//Audio funtion
+
 function quranAudio(surahNumber) {
-    
+                        //from cdn
     audioDiv.innerHTML=` <audio controls>
                             <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
                          </audio>
                          <audio controls>
                             <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
                          </audio>`
-    
+                         //from local
     audioDivMain.appendChild(audioDiv)
   
     apiData()
 }
-
 quranAudio(surahNumber)
-console.log(audioDiv);
-//Quran Text Data
+/*************************************Quran audio data end here *****************************************/
+
+/*************************************Quran Text Data Start here*****************************************/
+
+//apiData funtion for getting data
 async function apiData() {
     const translationKey = 'tamil_baqavi';
-
-   
     try {
         // Example for surah translation
         const surahRes = await fetch(`https://quranenc.com/api/v1/translation/sura/${translationKey}/${surahNumber}`);
         const surahData = await surahRes.json();
+       
+        
+        //send data via funtion parameter
         quranDta(surahData)
     } catch (err) {
         console.error(err);
     }
 }
 
+//api funtion for manipulating data
+//getting data from funtion argument
 async function quranDta(surahData) {
     const sura=surahData.result;
    
+
+    // Update the global array with full data
+    fullDataArr=sura.map(el => ({
+        arabicText:el.arabic_text,
+        tamilText:el.translation
+    }))
+   
+    //Save data into local
+    localStorage.setItem('fullDataArr',JSON.stringify(fullDataArr))
+
   // Display surah translation in the surah div
   const suraContainer= document.getElementById('sura')
   suraContainer.innerHTML='';
 
-  //slice data
 
+  //text controller
+  let textSize=0;
+  
+  //Reterive full data arr from local storage
+  const storedData=JSON.parse(localStorage.getItem('fullDataArr'))
+  console.log(storedData);
+  //slice data
   const startIndex=(currentPage-1)*itemPerPage;
   const endIndex=startIndex+itemPerPage;
 
-    sura.slice(startIndex,endIndex).forEach(element => {
-        const arabicText=element.arabic_text;
-        const tamilText=element.translation;
+  const slicedData=storedData.slice(startIndex,endIndex)
 
-        const div=document.createElement('div');
-    
-        div.innerHTML=`<h2 class="text-end m-4">${arabicText }<h2/>
-                       <h6>${tamilText}<h6/>`
+    slicedData.forEach(({arabicText,tamilText})=>{
+        const div = document.createElement('div');
 
-        suraContainer.appendChild(div)
-      
-    });
+        div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${32 + textSize}px;">${arabicText }<h2/>
+                       <h6 style="font-size: ${18 + textSize}px;">${tamilText}<h6/>`;
+
+        suraContainer.appendChild(div);
+    })
     pagination(sura.length)
 }
-
+/*************************************Quran Text Data end here*****************************************/
+/*************************************pagination start here********************************************/
 function pagination(len) {
     const btsCount=Math.ceil(len/itemPerPage)
     const paginationContainer=document.getElementById('pagination');
@@ -84,7 +107,8 @@ function pagination(len) {
         paginationContainer.appendChild(allBtn)
     }
 }
-
+/*************************************pagination end here********************************************/
+/**************************Dta manipulating sideMenu Heading and audio*******************************/
 //Surah names
 const quranSurahNames = [
     'Al-Fatiha', 'Al-Baqara', 'Aal-E-Imran', 'An-Nisa', 'Al-Ma\'ida', 'Al-An\'am', 'Al-A\'raf', 'Al-Anfal', 'At-Tawbah', 'Yunus', 'Hud', 'Yusuf', 'Ar-Ra\'d', 'Ibrahim', 'Al-Hijr', 'An-Nahl', 'Al-Isra', 'Al-Kahf', 'Maryam', 'Ta-Ha', 'Al-Anbiya', 'Al-Hajj', 'Al-Muminun', 'An-Nur', 'Al-Furqan', 'Ash-Shu\'ara', 'An-Naml', 'Al-Qasas', 'Al-Ankabut', 'Ar-Rum', 'Luqman', 'As-Sajda', 'Al-Ahzab', 'Saba', 'Fatir', 'Ya-Sin', 'As-Saffat', 'Sad', 'Az-Zumar', 'Ghafir', 'Fussilat', 'Ash-Shura', 'Az-Zukhruf', 'Ad-Dukhan', 'Al-Jathiya', 'Al-Ahqaf', 'Muhammad', 'Al-Fath', 'Al-Hujurat', 'Qaf', 'Adh-Dhariyat', 'At-Tur', 'An-Najm', 'Al-Qamar', 'Ar-Rahman', 'Al-Waqia', 'Al-Hadid', 'Al-Mujadila', 'Al-Hashr', 'Al-Mumtahina', 'As-Saff', 'Al-Jumu\'a', 'Al-Munafiqun', 'At-Taghabun', 'At-Talaq', 'At-Tahrim', 'Al-Mulk', 'Al-Qalam', 'Al-Haaqqa', 'Al-Maarij', 'Nuh', 'Al-Jinn', 'Al-Muzzammil', 'Al-Muddathir', 'Al-Qiyama', 'Al-Insan', 'Al-Mursalat', 'An-Naba', 'An-Nazi\'at', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Burooj', 'At-Tariq', 'Al-Ala', 'Al-Ghashiya', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Lail', 'Adh-Dhuha', 'Ash-Sharh', 'At-Tin', 'Al-Alaq', 'Al-Qadr', 'Al-Bayyina', 'Az-Zalzalah', 'Al-Adiyat', 'Al-Qaria', 'At-Takathur', 'Al-Asr', 'Al-Humazah', 'Al-Fil', 'Quraish', 'Al-Ma\'un', 'Al-Kawthar', 'Al-Kafiroon', 'An-Nasr', 'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'
@@ -141,7 +165,8 @@ function sideMenu(...quranSurahNames) {
                          <audio controls>
                                     <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
                         </audio>`
-        console.log(currentPage);
+       
+
         head.innerHTML = `<h3>${surahNumber}.${quranSurahNames[surahNumber - 1]}-${arabicSuraNames[surahNumber - 1]} <h3/>`;
         apiData()
        })
@@ -149,7 +174,9 @@ function sideMenu(...quranSurahNames) {
     })
    
 }
+/**************************Dta manipulating sideMenu Heading and audio*******************************/
 
+/**********************************Toggle controller start here**************************************/
 
 let btnOpen = document.getElementById("btnTop");
 let closebtnEl =  document.getElementById("closeBtn");
@@ -186,3 +213,4 @@ function scrollDown() {
 }
 topBtn.addEventListener('click',scrollDown)
 
+/**********************************Toggle controller end here**************************************/

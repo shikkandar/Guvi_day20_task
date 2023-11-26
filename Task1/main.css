@@ -45,11 +45,28 @@ nav{
 .x-btn{
     position: fixed;
     top: 59px;
-   left: 170px;
+    left: 170px;
     color: #fff;
     font-weight: 600;
 }
-
+.plus{
+    position: fixed;
+    bottom: 10px;
+    right: 60px;
+    border-radius: 50%;
+    width:35px;
+    height:35px;
+    font-weight: 900;
+}
+.minize{
+    position: fixed;
+    bottom: 10px;
+    right: 100px;
+    border-radius: 50%;
+    width:35px;
+    height:35px;
+    font-weight: 900;
+}
 .sub-2{
     height: 90vh;
     overflow: scroll; 
