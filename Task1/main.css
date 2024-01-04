@@ -6,7 +6,7 @@ body{
     color: #0e7545;
     text-decoration: underline ;
 }
-
+span{color: #0e7545;font-weight: bold;}
 img{
     width: 50px;
     height: 50px;
@@ -114,58 +114,69 @@ input{
   }
   
   /* Style for the audio player container */
-  .audio-container {
-    width: 300px;
-    margin: 20px;
+
+  .audio div{
+    position: fixed;
+    top: 62px;
+    width: 90vw;
+    display: flex;
+    left: 200px;
+    justify-content: space-between  ;
+  }
+  .audio div audio{
+    width: 48%;
   }
 
   /* Style for the audio controls */
-  audio {
-  position: fixed;
-  left: 220px;
-  top: 60px;
-  width: 40vw;
-    display: block;
-    margin: 10px 0;
-  }
-audio:nth-child(2){
-    position: fixed;
-    right: 0;
-    left: 60vw;
-    width: 40vw;
-    margin: 10px 0;
-}
-  /* Style for the default audio controls */
-  audio::-webkit-media-controls-panel {
+
+/* First Row */
+/* Style for the default audio controls */
+audio::-webkit-media-controls-panel {
     background-color: #f1f1f1;
     border-radius: 5px;
   }
-
-  /* Style for the play/pause button */
+  
+  /* Style for the play/pause button, time indicators, and volume controls in the first row */
+  audio::-webkit-media-controls-play-button,
+  audio::-webkit-media-controls-current-time-display,
+  audio::-webkit-media-controls-time-remaining-display,
+  audio::-webkit-media-controls-volume-slider::-webkit-media-controls-volume-slider-container {
+    width: 100%;
+  }
+  
   audio::-webkit-media-controls-play-button {
-    background-color:#0e7545;
+    background-color: #0e7545;
     color: white;
     border-radius: 20px;
   }
-
- 
-/* Style for the volume button */
-audio::-webkit-media-controls-volume-slider::-webkit-media-controls-mute-button {
+  
+  audio::-webkit-media-controls-volume-slider::-webkit-media-controls-mute-button {
     background-color: #4CAF50;
     color: white;
     border-radius: 5px;
   }
   
-  /* Style for the volume indicator */
-  audio::-webkit-media-controls-volume-slider::-webkit-media-controls-volume-slider-container {
-    width: 100%;
+  /* Second Row */
+  /* Style for the time track in the second row */
+  audio::-webkit-media-controls-timeline {
+    height: 10%;
+    border-radius: 5px;
+    position: relative;
+    top: 15px;
   }
-
-  /* Style for the time indicators */
-  audio::-webkit-media-controls-current-time-display,
-  audio::-webkit-media-controls-time-remaining-display {
-    color: #333;
+  
+  /* Style for the buffered part of the time track in the second row */
+  audio::-webkit-media-controls-timeline-container::-webkit-media-controls-timeline-buffer {
+    border-radius: 5px;
   }
+  
+  /* Style for the thumb of the time track (drag handle) in the second row */
+  audio::-webkit-media-controls-timeline-container::-webkit-media-controls-timeline-thumb {
+    width: 120px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
 .down,.top{
     position: fixed;
     bottom: 15px;
@@ -199,17 +210,51 @@ svg:hover{
 }
 .toggle{
     position: fixed;
-    top: 62px;
+    top: 68px;
     left: 2px;
     
 }
+/*language*/
+.language-btn{
+    border: none;
+    
+}
+.language-btn svg{
+    fill: #0e7545;
+    width: 40px;
+    height: 40px;
+}
+.language-list{
+    position: absolute;
+    top: 50px;
+    background-color: #f0f0f0;
+    z-index: 9999;
+    display: none;
+    opacity: 0.9;
+}
+.language-list ul{
+    margin: 0;
+    padding: 5px 40px;
+    background-color: #0e7545;
+    color:#fff;
+    border-radius: 5px;
+    right: 20px;
+    font-weight: 700;
+}
+.language-list ul li{
+    list-style: none;
+    border: none;
+    margin-top: 5px;
+    
+}
+
 @media (max-width:1500px) {
     .sub-2{
         padding: 10px;
     }
 }
 
-@media (max-width: 830px) {
+@media (max-width: 1000px) {
     .ol-btn{
         display: none;
     }
@@ -234,24 +279,30 @@ svg:hover{
     .shik{
         font-size: 14px;
     }
-    audio{
-        transform: scale(0.8);
-        left: 20px;
-        top: 45px;
-       width: 55vw;
+    .toggle{
+        top: 64px;
     }
-    audio:nth-child(2){
-        left: 50vw;
-        width: 55vw;
-    }
+    .audio div{
+        width: 95vw;
+        left: 45px;
+        justify-content: start;
+      }
+      .audio div audio{
+        height: 45px;
+        width: 44vw;
+      }
+ 
     ::-webkit-scrollbar {
         width: 0px; 
       }
-      
+    input{
+        width: 100px;
+        font-size: 0.7rem;
+    }
 
 }
 
-@media (min-width: 831px) {
+@media (min-width: 1000px) {
     .open-btn{
         display: none;
     }
@@ -261,5 +312,10 @@ svg:hover{
     #closeBtn{
         display: none;
     }
-
+   
+}
+@media (max-width:340px) {
+    input{
+        width: 30vw;
+    }
 }

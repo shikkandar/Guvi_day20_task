@@ -1,13 +1,76 @@
 /*********************************variable declaration for pagination*************************************/
-let currentPage=1;
-let itemPerPage=40;
-let surahNumber = 1;
-/********************************variable declaration for pagination***************************** *********/
+let currentPage;
+let surahNumber;
+const translationKey = {
+    Tamil: 'tamil_baqavi',
+    English:'english_saheeh',
+    Urdu:'urdu_junagarhi',
+    Hindi: 'hindi_omari',
+    Malayalam: 'malayalam_kunhi',
+    Telugu: 'telugu_muhammad',
+    Kannada:'english_rwwad',
+    Punjabi: 'punjabi_arif',
+    Gujarati:'gujarati_omari',
+    Assamese: 'assamese_rafeeq',
+    Nepali: 'assamese_rafeeq',
+};
+let lan = 'Tamil';
+// Save data into local storage
+function saveDataToLocalStorage() {
+    localStorage.setItem('currentPage', currentPage.toString());
+    localStorage.setItem('surahNumber', surahNumber.toString());
+    localStorage.setItem('language', lan);
+}
+
+// Retrieve data from local storage or use default values
+function retrieveDataFromLocalStorage() {
+    currentPage = parseInt(localStorage.getItem('currentPage'), 10) || 1;
+    surahNumber = parseInt(localStorage.getItem('surahNumber'), 10) || 1;
+    lan = localStorage.getItem('language') || 'Tamil';
+
+}
+
+// Initialize current page and surahNumber
+retrieveDataFromLocalStorage();
+
+/*********************************variable declaration for pagination*************************************/
+let itemPerPage = 50;
 
 
 
 
 
+/*************************************language selection start*****************************************/
+
+
+
+const language = document.getElementById('language-list');
+const ul = document.createElement('ul');
+language.appendChild(ul);
+
+Object.keys(translationKey).forEach(key => {
+    const li = document.createElement('li');
+    li.innerText = key;
+    ul.appendChild(li);
+
+    li.addEventListener('click', function() {
+        lan = li.innerText;
+
+        // Save the updated language to localStorage
+        saveDataToLocalStorage();
+
+        quranAudio(surahNumber);
+        apiData();
+    });
+});
+
+
+
+function lanBtn() {
+    language.style.display=(language.style.display==='block') ?'none':'block';
+}
+
+/*************************************language selection eng*****************************************/
 
 
 
@@ -26,12 +89,13 @@ function quranAudio(surahNumber) {
                             <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
                          </audio>
                          <audio controls>
-                            <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
+                            <source src="audio/${lan}/${surahNumber}.mp3" type="audio/mp3">
                          </audio>`
                          //from local
     audioDivMain.appendChild(audioDiv)
   
     apiData()
+    retrieveDataFromLocalStorage()
 }
 quranAudio(surahNumber)
 /*************************************Quran audio data end here *****************************************/
@@ -46,36 +110,64 @@ quranAudio(surahNumber)
 
 
 
-/*************************************Quran Text Data Start here*****************************************/
 
+
+
+/*************************************Quran Text Data Start here*****************************************/
 //apiData funtion for getting data
 async function apiData() {
-    const translationKey = 'tamil_baqavi';
     try {
         // Example for surah translation
-        const surahRes = await fetch(`https://quranenc.com/api/v1/translation/sura/${translationKey}/${surahNumber}`);
+        const surahRes = await fetch(`https://quranenc.com/api/v1/translation/sura/${translationKey[lan]}/${surahNumber}`);
         const surahData = await surahRes.json();
+       console.log(surahData);
+        const kannadaSurah=await fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/kan-abdussalamputhi.min.json');
+        const kannadaSurahData= await kannadaSurah.json()
        
-        
+        const nepaliSurah=await fetch('https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/nep-ahlalhadithcent-la.json');
+        const nepaliSurahData= await nepaliSurah.json()
+
+
         //send data via funtion parameter
-        quranDta(surahData)
+        quranDta(surahData,kannadaSurahData,nepaliSurahData)
     } catch (err) {
         console.error(err);
     }
+    retrieveDataFromLocalStorage()
 }
 
 //api funtion for manipulating data
 //getting data from funtion argument
-async function quranDta(surahData) {
+async function quranDta(surahData,kannadaSurahData,nepaliSurahData) {
     const sura=surahData.result;
    
 
     // Update the global array with full data
-    fullDataArr=sura.map(el => ({
-        arabicText:el.arabic_text,
-        tamilText:el.translation
-    }))
-   
+    fullDataArr = sura.map(el => {
+        const arabicText = el.arabic_text;
+        let translateText = el.translation.replace(/\d/g, ''); // Remove numeric characters
+        const dotIndex = translateText.indexOf('.');
+    
+        // Remove the first occurrence of ()
+        const firstParenthesesIndex = translateText.indexOf('(');
+        if (firstParenthesesIndex !== -1) {
+            const closingParenthesesIndex = translateText.indexOf(')', firstParenthesesIndex);
+            if (closingParenthesesIndex !== -1) {
+                translateText = translateText.slice(0, firstParenthesesIndex) + translateText.slice(closingParenthesesIndex + 1);
+            }
+        }
+    
+        // Remove all square brackets []
+        translateText = translateText.replace(/\[.*?\]/g, '');
+    
+        return {
+            arabicText,
+            translateText: dotIndex !== -1 ? translateText.slice(0, dotIndex) + translateText.slice(dotIndex + 1) : translateText,
+            aya: el.aya
+        };
+    });
+    
+  
     //Save data into local
     localStorage.setItem('fullDataArr',JSON.stringify(fullDataArr))
 
@@ -119,17 +211,50 @@ async function quranDta(surahData) {
 
   const slicedData=storedData.slice(startIndex,endIndex)
   const suraContainer= document.getElementById('sura')
- function dataPrinting() {
-    suraContainer.innerHTML='';
-    slicedData.forEach(({arabicText,tamilText})=>{
-        const div = document.createElement('div');
 
+
+  function dataPrinting() {
+    suraContainer.innerHTML = '';
+    slicedData.forEach(({ arabicText, translateText, aya }) => {
+        const div = document.createElement('div');
+        div.className = 'kannada'; // Use class instead of ID
         div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${arabicFont}px;">${arabicText }<h2/>
-                       <h6 style="font-size: ${tamilFont}px;">${tamilText}<h6/>`;
+                       <h6 style="font-size: ${tamilFont}px;">${aya}.${translateText}<h6/>`;
 
         suraContainer.appendChild(div);
-    })
- }
+        kannadaText({ arabicText, translateText, aya }, div); // Pass the div element as an argument
+        nepaliText({ arabicText, translateText, aya }, div); // Pass the div element as an argument
+    });
+}
+
+function kannadaText({ arabicText, aya }, div) {
+    kannadaSurahData.quran.forEach((data) => {
+        if (data.chapter === surahNumber) {
+            if (lan === "Kannada") {
+                console.log(data);
+                div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${arabicFont}px;">${arabicText }<h2/>
+                <h6 style="font-size: ${tamilFont}px;">${aya}.${data.text}<h6/>`;
+            }else{
+
+            }
+        }
+    });
+}
+function nepaliText({ arabicText, aya }, div) {
+    nepaliSurahData.quran.forEach((data) => {
+        if (data.chapter === surahNumber) {
+            if (lan === "Nepali") {
+                console.log(data);
+                div.innerHTML = `<h2 class="text-end m-4" style="font-size: ${arabicFont}px;">${arabicText }<h2/>
+                <h6 style="font-size: ${tamilFont}px;">${aya}.${data.text}<h6/>`;
+            }else{
+
+            }
+        }
+    });
+}
+
+
  dataPrinting()
     pagination(sura.length)
 }
@@ -159,12 +284,21 @@ function pagination(len) {
 
 
         allBtn.innerText=i;
-        allBtn.addEventListener('click',()=>{
-            currentPage=i;
-            apiData()
-        })
+        allBtn.addEventListener('click', () => {
+            currentPage = i;
+        
+            // Save the updated currentPage value to localStorage
+            saveDataToLocalStorage();
+        
+            // Fetch and display updated data
+            apiData();
+        
+            // Scroll to top
+            scrollToTop();
+        });
+        
         paginationContainer.appendChild(allBtn)
-        allBtn.addEventListener('click', scrollTop);
+        allBtn.addEventListener('click', scrollToTop);
     }
 }
 /*************************************pagination end here********************************************/
@@ -207,7 +341,7 @@ document.getElementById('inpuBtn').addEventListener('click', () => {
                                 <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
                              </audio>
                             <audio controls>
-                                <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
+                                <source src="audio/${lan}/${surahNumber}.mp3" type="audio/mp3">
                             </audio>`
         input.value = '';
         apiData(); // Fetch and display updated data
@@ -215,40 +349,48 @@ document.getElementById('inpuBtn').addEventListener('click', () => {
     }else alert("Enter a valid surah")
 });
 
+retrieveDataFromLocalStorage();
 // Example usage
 apiData();
 
 //Funtion for sidemenu and and changing surah head and content of surah
 sideMenu(...quranSurahNames)
 function sideMenu(...quranSurahNames) {
-    const sideMenuContainer=document.getElementById("sub-1")
-  apiData()
-    quranSurahNames.forEach((data,i)=>{
-      const surahName=data;
-       const li=document.createElement('li')
-        li.setAttribute('class',"mt-2")
-        li.innerText=surahName;
-       sideMenuContainer.appendChild(li)
+    const sideMenuContainer = document.getElementById("sub-1");
+    apiData();
 
-       
-       li.addEventListener('click',()=>{
-        currentPage=1;
-        surahNumber=i+1;
-        audioDiv.innerHTML=`<audio controls>
-                                <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
-                            </audio>
-                            <audio controls>
-                                <source src="Tamilquran/${surahNumber}.mp3" type="audio/mp3">
-                            </audio>`
-        head.innerHTML = `<h3>${surahNumber}.${quranSurahNames[surahNumber - 1]}-${arabicSuraNames[surahNumber - 1]} <h3/>`;
-        apiData()
-        toggleBtn();
-        scrollTop()
-       })
-       
-    })
-   
+    quranSurahNames.forEach((data, i) => {
+        const surahName = data;
+        const li = document.createElement('li');
+        li.setAttribute('class', "mt-2");
+        li.innerText = surahName;
+        sideMenuContainer.appendChild(li);
+
+        li.addEventListener('click', () => {
+            // Update currentPage and surahNumber
+            currentPage = 1;
+            surahNumber = i + 1;
+
+            // Save updated data to local storage
+            saveDataToLocalStorage();
+
+            // Update audio and heading
+            audioDiv.innerHTML = `<audio controls>
+                                    <source src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3" type="audio/mp3">
+                                </audio>
+                                <audio controls>
+                                    <source src="audio/${lan}/${surahNumber}.mp3" type="audio/mp3">
+                                </audio>`;
+            head.innerHTML = `<h3>${surahNumber}.${quranSurahNames[surahNumber - 1]}-${arabicSuraNames[surahNumber - 1]} <h3/>`;
+
+            // Fetch and display updated data
+            apiData();
+            toggleBtn();
+            scrollToTop();
+        });
+    });
 }
+
 /**************************Dta manipulating sideMenu Heading and audio*******************************/
 
 
@@ -291,13 +433,17 @@ closebtnEl.addEventListener("click" , toggleBtn);
 // Scroll to top 
 const upBtn = document.getElementById('top');
 const sub2 = document.getElementById('sub-2');
-
+sub2.addEventListener('click',()=>{
+    language.style.display='none'
+})
 function scrollTop() {
     sub2.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 upBtn.addEventListener('click', scrollTop);
-
+function scrollToTop() {
+    sub2.scrollTo({ top: 0 });
+  }
 
 //scroll down
 
@@ -309,4 +455,4 @@ function scrollDown() {
 }
 topBtn.addEventListener('click',scrollDown)
 
-/**********************************Scroll control end here**************************************/
+saveDataToLocalStorage();
